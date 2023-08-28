@@ -4,14 +4,14 @@
 
 {% block main %}
 <div class="description-box">
-  <p>cjkehs fjdsbdhjf dj dshzjfg chjxvg djh vgxhj vgxhj vgxjhcv gcxhjv ghj ghjfgsdj hcgcxhjv gcxhv gcxhzjxv cbxnxb cvxhxn cgvxnbcngv bv bx vbnvc dgxnc gshxz bcncx vhczv x vncxbzv nv nczv bcsd</p>
+  <p>Welcome to the Te-Reo Maori to English dictionary! Use the drop-down menu to select a category.</p>
 </div>
 
 <div id="category-dropdown">
-  <button id="category-button">Choose Category</button>
+  <button id="category-button">{{ current_page.title() }}</button>
   <div id="dropdown-contents">
     {% for category in categories %}
-    <li><a href = "/dictionary/{{ category [0] }}">{{ category[1] }}</a></li>
+    <li><a href = "/dictionary/{{ category [0] }}">{{ category[1].title() }}</a></li>
     {% endfor %}
   </div>
 </div>

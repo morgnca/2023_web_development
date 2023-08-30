@@ -7,36 +7,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css"/>
-    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
 </head>
 
 <body>
-<div class="container">
-    <header>
-        <h1>Te-Reo Maori Dictionary</h1>
-        <h2>{% block pageheading %}{% endblock %}</h2>
-    </header>
-
-    <nav>
-      <div class="container">
-          <div class="navbar-links">
-              <a href="/">home</a>
-              <a href="/dictionary/1">dictionary</a>
-              <!--{% if logged_in %}
-                <a href="/admin">admin</a>
-                <a href="/logout">logout</a>
-              {% else %}
-                <a href="/login">login</a>
-              {% endif %}-->
-          </div>
-      </div>
-    </nav>
-
-    <main>
-        {% block main %}
-        {% endblock %}
-    </main>
-</div>
+  <div id="error-message">
+    <h4>{{ message }}</h4>
+  </div>
+  
+  <div class="container">
+      <header>
+          <h1>Te-Reo Maori Dictionary</h1>
+          <h2>{% block pageheading %}{% endblock %}</h2>
+      </header>
+  
+      <nav>
+        <div class="container">
+            <div class="navbar-links">
+                <a href="/">home</a>
+                <a href="/dictionary/1">dictionary</a>
+                {% if teacher %}
+                  <a href="/admin">admin</a>
+                {% endif %}
+                {% if logged_in %}
+                  <a href="/logout">logout</a>
+                {% else %}
+                  <a href="/login">login</a>
+                {% endif %}
+            </div>
+        </div>
+      </nav>
+  
+      <main>
+          {% block main %}
+          {% endblock %}
+      </main>
+  </div>
 </body>
+
+<footer>
+  Copyright, Morgan Chong-Arkell 2023
+</footer>
 
 </html>

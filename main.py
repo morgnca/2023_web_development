@@ -6,11 +6,12 @@ from flask_bcrypt import Bcrypt
 from flask import session
 import datetime
 
-# Set-up for database
+# Set-up for database, constants
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.secret_key = "c2VuZGhlbHA"
 DATABASE = "dictionary.db"
+STUDENT_EMAIL = "student"
 
 def create_connection(db_file):
   """Create connection to database"""
@@ -76,8 +77,11 @@ def check_admin():
 # Webpage shortcuts
 @app.route('/')
 def render_homepage():
+  message = request.args.get('message')
+  if message is None:
+    message = ""
   return render_template('index.html',logged_in=is_logged_in(),
-                         teacher=check_admin())
+                         teacher=check_admin(), message=message)
 
 @app.route('/dictionary/<cat_id>')
 def render_dict_page(cat_id):
@@ -88,7 +92,7 @@ def render_dict_page(cat_id):
   words = get_list("SELECT * FROM words WHERE category_id = ?",
                    [cat_id])
   for i in words:
-    print(i[0], i[2], i[3],i[6])
+    print(i)
   
   return render_template('dictionary.html', 
                          categories = get_categories(), words=words,
@@ -122,11 +126,11 @@ def render_login():
       print(user_id, first_name, teacher, db_password)
       
     except IndexError:
-      return ("redirect/login?error=Email+invalid+or+password+incorrect")
+      return redirect("/login?error=Email+invalid+or+password+incorrect")
 
     # Validation for the password being correct
     if not bcrypt.check_password_hash(db_password, password):
-      return redirect(request.referrer + "?error=Email+invalid+or+password+incorrect")
+      return redirect(request.referrer + "?message=Email+invalid+or+password+incorrect")
 
     # Setting the session data
     session['email'] = email
@@ -136,17 +140,23 @@ def render_login():
     print(session)
     return redirect('/')
     
+  
+  message = request.args.get('message')
+  print(message)
+  if message is None:
+    message = ""
   return render_template('login.html', logged_in=is_logged_in(),
-                         teacher=check_admin())
+                         teacher=check_admin(), message=message)
 
 @app.route('/logout')
 def logout():
   print(list(session.keys()))
-  [session.pop(key) for key in list(session.keys())]
+  for key in list(session.keys()):
+    session.pop(key)
   print(list(session.keys()))
   return redirect('/?message=See+you+next+time!')
 
-@app.route('/signup')
+@app.route('/signup', methods=['POST', 'GET'])
 def render_signup():
   if is_logged_in():
       return redirect('/dictionary/1')
@@ -157,31 +167,43 @@ def render_signup():
     email = request.form.get('email').lower().strip()
     password = request.form.get('password')
     password2 = request.form.get('password2')
+    teacher = 1
 
     if password != password2:
-      return redirect("\signup?error=Passwords+do+not+match")
+      return redirect("/signup?error=Passwords+do+not+match")
 
     if len(password) < 8:
-      return redirect("\signup?error=Password+must+be+at+least+8+characters")
+      return redirect("/signup?error=Password+must+be+at+least+8+characters")
 
     hashed_password = bcrypt.generate_password_hash(password)
 
+    # Assign the user a student or teacher account
+    if not request.form.get('teacher') or STUDENT_EMAIL in email:
+      teacher = 0
+      
+
     con = create_connection(DATABASE)
-    query = "INSERT INTO user (first_name, last_name, email, password) VALUES (?, ?, ?, ?)"
+    query = """INSERT INTO users 
+    (first_name, last_name, email, password, teacher) 
+    VALUES (?, ?, ?, ?, ?)"""
     cur = con.cursor()
 
     try:
-      cur.execute(query, (fname, lname, email, hashed_password))
+      cur.execute(query, (fname, lname, email, hashed_password, teacher))
     except sqlite3.IntegrityError:
       con.close()
-      return redirect('\signup?error=Email+is+already+used')
+      return redirect('/signup?error=Email+is+already+used')
 
     con.commit()
     con.close()
 
-    return redirect("\login")
+    return redirect("/login")
+  message = request.args.get('error')
+  print(message)
+  if message is None:
+    message = ""
   return render_template('signup.html',logged_in=is_logged_in(),
-                         teacher=check_admin())
+                         teacher=check_admin(), message=message)
 
 @app.route('/word_info/<word_id>')
 def render_word_info(word_id):
@@ -195,7 +217,7 @@ def render_word_info(word_id):
 def add_category():
   """Add a new category to the database"""
   if not is_logged_in():
-    return redirect('/?message=Need+to+be+logged+in.')
+    return redirect('/?error=Need+to+be+logged+in.')
   if request.method == "POST":
     print(request.form)
     cat_name = request.form.get('name').lower().strip()
@@ -253,6 +275,8 @@ def add_word():
     image = request.form.get("image")
     if image:
       image.strip()
+    else:
+      image = None
     category = request.form.get("cat_id").strip()
     user = str(session.get('user_id'))
     time = str(datetime.datetime.now())

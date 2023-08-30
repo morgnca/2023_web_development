@@ -8,13 +8,17 @@
 #container {
     display: grid;
     grid-template-columns: 75px auto;
-    grid-template-areas: 'nav header' 'main main' 'footer footer';
+    grid-template-areas: 'header' 'nav' 'main main' 'footer footer';
     }
 
 header {
     grid-area: header;
-    background-color: #f00;
+    background-color: #6E2D27;
     padding: 1rem;
+}
+
+html {
+  background-image: url('images/poutama.jpg');
 }
 
 nav {
@@ -24,14 +28,23 @@ nav {
 main {
     grid-area: main;
     padding: 1rem;
-    background-color: #edd;
+    background-color: #E5D4BD;
 }
 
-h1, h2, h3, h4 {
+body {
+  margin: 0;
+  padding-right: 10%;
+  padding-left: 10%;
+}
+
+h1, h2 {
+  color: white;
+}
+
+h3, h4 {
     padding: 1rem 0;
     font-family: 'Suez One', serif;
     color: #000;
-    text-shadow: 2px 2px 4px #fff;
 }
 
 p {
@@ -98,7 +111,7 @@ img .thumb {
 footer {
     grid-area: footer;
     padding: 1rem;
-    background-color: #f00;
+    background-color: #6E2D27;
 }
 
 footer p {
@@ -111,24 +124,90 @@ footer img {
     float: right;
 }
 
+/* Dictionary Page Classes/ids */
+#description-box {
+  background-color: #886159;
+}
+
+#category-dropdown {
+  position: relative;
+}
+
+#dropdown-contents {
+  display: none;
+  position: absolute;
+  background-color: #BB6758;
+  list-style-type: none;
+}
+
+#dropdown-contents li{
+  display: inline-block;
+  padding: 1%;
+}
+
+#dropdown-contents a {
+  text-decoration: none;
+  color: white;
+}
+
+#dropdown-contents a:hover{
+  text-decoration: underline;
+}
+
+#category-dropdown:hover #dropdown-contents {
+  display: block;
+}
+
+#category-nav ul {
+  overflow: hidden;
+  list-style-type: none;
+  margin: 0;
+}
+
+#category-nav li {
+  float: left;
+  padding-left: 2%;
+  padding-right: 2%;
+}
+
+.word-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.word-box {
+  width: 31%;
+  margin-bottom: 1rem;
+}
+.word-box-image {
+  height: 150px;
+  overflow: hidden;
+}
+
+.word-box-info {
+  padding: 0.5rem;
+}
+
+/* Media */
 @media only screen and (max-width: 768px) {
     nav
     {
       display: block;
       position: relative;
-      top: 20px;
-      left: 20px;
+      padding: 3%;
+      background-color: #886159;
 
       z-index: 1;
 
       -webkit-user-select: none;
       user-select: none;
     }
-
+  
     nav a
     {
       text-decoration: none;
-      color: #232323;
+      color: white;
       transition: color 0.3s ease;
     }
 
@@ -260,10 +339,9 @@ footer img {
     }
 
     nav {
-        background: linear-gradient(180deg, rgba(255,0,0,1) 0%, rgba(0, 0, 0, 1) 50%,  rgba(255,0,0,1) 100%);
-        padding: 0.5rem;
+      padding: 1.5%;
+      background-color: #886159;
     }
-
     nav ul {
         list-style: none;
     }
@@ -276,16 +354,12 @@ footer img {
     }
 
     nav a:hover {
-        color: #000;
-        background-color: #fff;
+        color: tomato;
     }
     nav input, nav span {
         visibility: hidden;
     }
 
-    main {
-        background-image: url('/poutama.jpg');
-    }
     .formRow {
         display: grid;
         grid-template-columns: 1fr 2fr;

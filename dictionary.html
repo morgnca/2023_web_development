@@ -3,7 +3,7 @@
 {% block pageheading %}Dictionary{% endblock %}
 
 {% block main %}
-<div class="description-box">
+<div id="description-box">
   <p>Welcome to the Te-Reo Maori to English dictionary! Use the drop-down menu to select a category.</p>
 </div>
 
@@ -20,15 +20,15 @@
   {% for word in words %}
     <div class="word-box">
       <div class="word-box-image">
-        {% if word[6] == None %}
+        {% if word[4] == None %}
         <img src="/static/images/noimage.png">
         {% else %}
-        <img src="/static/images/{{ word[6] }}">
+        <img src="/static/images/{{ word[4] }}">
         {% endif %}
       </div>
       <div class="word-box-info">
-        <h3>{{ word[1] }}</h3>
-        <p>{{ word[2] }}</p>
+        <h3>{{ word[1].title() }}</h3>
+        <p>{{ word[2].title() }}</p>
       </div>
     </div>
   {% endfor %}

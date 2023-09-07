@@ -217,16 +217,20 @@ def render_word_info(word_id):
   if not word_info[8]:
     word_info[8] = "1"
   users = get_list("SELECT first_name, last_name FROM users WHERE user_id = ?", [word_info[8]])
-  print("death to all", users)
   user = str(" ".join(users[0]).title())
   word_info[8] = user
   category = get_list("SELECT category_name FROM categories WHERE category_id = ?", [word_info[7]])
-  word_info[7] = category[0]
+  word_info[7] = " ".join(category[0]).title()
   print(word_info)
+
+  message = request.args.get('error')
+  print(message)
+  if message is None:
+    message = ""
   
   return render_template('word_info.html', word=word_info,
                          logged_in=is_logged_in(),
-                         teacher=check_admin())
+                         teacher=check_admin(), message=message)
 
 # Admin Functions
 @app.route('/add_category', methods=['POST'])

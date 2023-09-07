@@ -1,9 +1,33 @@
 {% extends "base.html" %}
 
-{% block pageheading %}what am i{% endblock %}
+{% block pageheading %}Learn More{% endblock %}
 
 {% block main %}
-
-<p>word_info[1]</p>
-
+<div class="word-info">
+  <div class="left-info">
+    <h2>{{ word[1].title() }}</h2>
+    <h3>English: {{ word[2].title() }}</h3>
+    <br>
+    <p>Level: {{ word[5] }}</p>
+    <p>Description: {{ word[3] }}</p>
+  </div>
+  
+  <div class="right-info">
+    <div class="info-image">
+      {% if word[4] == None %}
+      <img src="/static/images/noimage.png">
+      {% else %}
+      <img src="/static/images/{{ word[4] }}">
+      {% endif %}
+    </div>
+    <div class="left-info-words">
+      <p>Created by {{ word[8] }}</p>
+      {% if not word[6] == None %}
+      <p>{{ word[6] }}</p>
+      {% else %}
+      <p>(Time created not recorded)</p>
+      {% endif %}
+    </div>
+  </div>
+<div class="word-info">
 {% endblock %}

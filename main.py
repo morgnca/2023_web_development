@@ -80,6 +80,9 @@ def render_homepage():
   message = request.args.get('message')
   if message is None:
     message = ""
+  #pw = bcrypt.generate_password_hash('decayisanextantformoflife')
+  #print(pw)
+  #put_data("UPDATE users SET password=?", [pw])
   return render_template('index.html',logged_in=is_logged_in(),
                          teacher=check_admin(), message=message)
 
@@ -205,11 +208,24 @@ def render_signup():
   return render_template('signup.html',logged_in=is_logged_in(),
                          teacher=check_admin(), message=message)
 
-@app.route('/word_info/<word_id>')
+@app.route('/word_info/<int:word_id>')
 def render_word_info(word_id):
-  word_info = get_list("SELECT * FROM words WHERE word_id = ?",[word_id])
+  words = get_list("SELECT * FROM words WHERE word_id = ?",[word_id])
+  word_info = list(words[0])
+
+  # Rtrieving the category and user who created the word from ids
+  if not word_info[8]:
+    word_info[8] = "1"
+  users = get_list("SELECT first_name, last_name FROM users WHERE user_id = ?", [word_info[8]])
+  print("death to all", users)
+  user = str(" ".join(users[0]).title())
+  word_info[8] = user
+  category = get_list("SELECT category_name FROM categories WHERE category_id = ?", [word_info[7]])
+  word_info[7] = category[0]
+  print(word_info)
   
-  return render_template('index.html', word_info,logged_in=is_logged_in(),
+  return render_template('word_info.html', word=word_info,
+                         logged_in=is_logged_in(),
                          teacher=check_admin())
 
 # Admin Functions

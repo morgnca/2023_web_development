@@ -6,9 +6,52 @@
 <div class="word-info">
   <div class="left-info">
     <h2>{{ word[1].title() }}</h2>
-    <h3>English: {{ word[2].title() }}</h3>
+    {% if teacher %}
+    <form class="word-info-form" method="post" action="/edit/{{ word[0] }}/word_name">
+      <input type="text" name="value" id="word_name">
+      <input type="submit" value="Change Word's Name">
+    </form>
+    {% endif %}
+
+    <p>Category: {{ word[7].title() }}</p>
+    {% if teacher %}
+    <form class="word-info-form" method="post" action="/edit/{{ word[0] }}/category">
+      <select id="category" name="value">
+            {% for category in categories %}
+              <option value ="{{ category[0] }}">{{ category[1].title() }}</option>
+            {% endfor %}
+          </select>
+      <input type="submit" value="Change Category">
+    </form>
+    {% endif %}
+      
+    <p>English: {{ word[2].title() }}</p>
+    {% if teacher %}
+    <form class="word-info-form" method="post" action="/edit/{{ word[0] }}/english">
+      <input type="text" name="value" id="english">
+      <input type="submit" value="Change English">
+    </form>
+    {% endif %}
+    
     <p>Level: {{ word[5] }}</p>
+    {% if teacher %}
+    <form class="word-info-form" method="post" action="/edit/{{ word[0] }}/level">
+      <select id="level-select" name="value" required> 
+            {% for i in range(1,11) %}
+              <option value ="{{ i }}">{{ i }}</option>
+            {% endfor %}
+          </select>
+      <input type="submit" value="Change Level">
+    </form>
+    {% endif %}
+    
     <p>Description: {{ word[3] }}</p>
+    {% if teacher %}
+    <form class="word-info-form" method="post" action="/edit/{{ word[0] }}/description">
+      <input type="text" name="value" id="description">
+      <input type="submit" value="Change Level">
+    </form>
+    {% endif %}
   </div>
   
   <div class="right-info">
@@ -18,6 +61,12 @@
       {% else %}
       <img src="/static/images/{{ word[4] }}">
       {% endif %}
+      {% if teacher %}
+    <form class="word-info-form" method="post" action="/edit/{{ word[0] }}/image">
+      <input type="text" name="value" id="image">
+      <input type="submit" value="Change Image Path">
+    </form>
+    {% endif %}
     </div>
     <div class="left-info-words">
       <p>Created by {{ word[8] }}</p>

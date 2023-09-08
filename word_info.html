@@ -15,7 +15,7 @@
 
     <p>Category: {{ word[7].title() }}</p>
     {% if teacher %}
-    <form class="word-info-form" method="post" action="/edit/{{ word[0] }}/category">
+    <form class="word-info-form" method="post" action="/edit/{{ word[0] }}/category_id">
       <select id="category" name="value">
             {% for category in categories %}
               <option value ="{{ category[0] }}">{{ category[1].title() }}</option>
@@ -49,7 +49,7 @@
     {% if teacher %}
     <form class="word-info-form" method="post" action="/edit/{{ word[0] }}/description">
       <input type="text" name="value" id="description">
-      <input type="submit" value="Change Level">
+      <input type="submit" value="Change Description">
     </form>
     {% endif %}
   </div>

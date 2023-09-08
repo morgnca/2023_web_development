@@ -45,12 +45,13 @@ def put_data(query, parameters):
 
 def get_categories():
   """Retrieve all category ids, names"""
-  cat_list = get_list("SELECT * FROM categories","")
+  cat_list = get_list("""SELECT * FROM categories 
+  ORDER BY category_name""","")
   return cat_list
 
 def get_word_list():
   """Retrieve info of all words"""
-  word_list = get_list("SELECT * FROM words","")
+  word_list = get_list("SELECT * FROM words ORDER BY word_name","")
   return word_list
 
 # Login checking functions
@@ -92,22 +93,30 @@ def render_dict_page(cat_id):
   FROM categories 
   WHERE category_id = ?""", [cat_id])
   current_page = str(current_category[0][0]).title()
-  words = get_list("SELECT * FROM words WHERE category_id = ?",
+  words = get_list("""SELECT * FROM words WHERE category_id = ?
+  ORDER BY word_name""",
                    [cat_id])
-  for i in words:
-    print(i)
+
+  message = request.args.get('message')
+  print(message)
+  if message is None:
+    message = ""
   
   return render_template('dictionary.html', 
                          categories = get_categories(), words=words,
                         logged_in=is_logged_in(), teacher=check_admin(),
-                        current_page=current_page)
+                        current_page=current_page, message=message)
 
 @app.route('/admin')
 def render_admin():
+  message = request.args.get('message')
+  print(message)
+  if message is None:
+    message = ""
   return render_template('admin.html', words = get_word_list(), 
                          categories =get_categories(),
                          logged_in=is_logged_in(),
-                         teacher=check_admin())
+                         teacher=check_admin(), message=message)
   
 @app.route('/login', methods=['POST', 'GET'])
 def render_login():
@@ -129,7 +138,7 @@ def render_login():
       print(user_id, first_name, teacher, db_password)
       
     except IndexError:
-      return redirect("/login?error=Email+invalid+or+password+incorrect")
+      return redirect("/login?message=Email+invalid+or+password+incorrect")
 
     # Validation for the password being correct
     if not bcrypt.check_password_hash(db_password, password):
@@ -208,7 +217,7 @@ def render_signup():
   return render_template('signup.html',logged_in=is_logged_in(),
                          teacher=check_admin(), message=message)
 
-@app.route('/word_info/<int:word_id>')
+@app.route('/word_info/<int:word_id>', methods=['GET', 'POST'])
 def render_word_info(word_id):
   words = get_list("SELECT * FROM words WHERE word_id = ?",[word_id])
   word_info = list(words[0])
@@ -230,7 +239,8 @@ def render_word_info(word_id):
   
   return render_template('word_info.html', word=word_info,
                          logged_in=is_logged_in(),
-                         teacher=check_admin(), message=message)
+                         teacher=check_admin(), message=message,
+                         categories=get_categories())
 
 # Admin Functions
 @app.route('/add_category', methods=['POST'])
@@ -252,7 +262,7 @@ def add_category():
 
 @app.route('/delete_category', methods=['POST'])
 def render_delete_category():
-  """Remove a new category to the database"""
+  """Remove a category to the database"""
   if not is_logged_in():
     return redirect('/?message=Need+to+be+logged+in.')
   if request.method == "POST":
@@ -260,8 +270,16 @@ def render_delete_category():
     print(category)
     category = category.split(", ")
     cat_id = category[0]
-    cat_name = category[1]
-    return render_template('confirm_delete.html', id=cat_id, name=cat_name, type="category")
+    cat_name = category[1].title()
+
+    message = request.args.get('error')
+    print(message)
+    if message is None:
+      message = ""
+      
+    return render_template('confirm_delete.html', id=cat_id,
+                           name=cat_name, type="category",
+                           message=message)
     return redirect("/admin")
 
 @app.route('/delete_category_confirm/<int:cat_id>')
@@ -279,7 +297,7 @@ def delete_category_confirm(cat_id):
 
 @app.route('/add_word', methods=['POST'])
 def add_word():
-  """Add a word to the dictionary using data from a form"""
+  """Add a word to the dictionary"""
   if not is_logged_in():
     return redirect('/?message=Need+to+be+logged+in.')
   if request.method == "POST":
@@ -313,6 +331,7 @@ def add_word():
 
 @app.route('/delete_word', methods=['POST'])
 def delete_word():
+  """Delete a word from the dictionary"""
   if not is_logged_in():
     return redirect('/?message=Need+to+be+logged+in.')
   if request.method == "POST":
@@ -323,8 +342,14 @@ def delete_word():
 
     word = items.split(", ")
     word_id = word[0]
-    word_name = word[1] if len(word) > 1 else ""
-    return render_template('confirm_delete.html', id=word_id, name=word_name, type="word")
+    word_name = word[1].title() if len(word) > 1 else ""
+
+    message = request.args.get('error')
+    print(message)
+    if message is None:
+      message = ""
+    
+    return render_template('confirm_delete.html', id=word_id, name=word_name, type="word", message=message)
     return redirect("/admin")
 
 @app.route('/delete_word_confirm/<int:word_id>')
@@ -337,7 +362,31 @@ def delete_item_confirm(word_id):
   cur.execute(query, (word_id, ))
   con.commit()
   con.close()
+  
   return redirect("/admin")
+
+@app.route('/edit/<int:word_id>/<type>', methods=['POST'])
+def edit_word(word_id, type):
+  """Edit a value of a word from the dictionary"""
+  if not is_logged_in():
+    return redirect('/?message=Need+to+be+logged+in.')
+
+  # Retrieve the new value
+  if request.method == "POST":
+    value = request.form.get('value')
+    if value is None:
+      return redirect("/admin?error=No+value+selected")
+    print(value)
+
+    # Updating the database
+    #if type == "word_name":
+      #put_data("""UPDATE words SET word_name = ? 
+      #WHERE word_id = ?""", (value, word_id))
+    #elif type == "english":
+    query = str("UPDATE words SET "+type+" = ? WHERE word_id = ?")
+    put_data(query, (value, word_id)) 
+      
+    return redirect("/?message=Updated+information")
 
 
 app.run(host='0.0.0.0', port=81)

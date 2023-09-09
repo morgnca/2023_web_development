@@ -53,8 +53,6 @@
         <div class="form-element"><input type="submit" value="Add Word"></div>
       </div>
     </form>
-    
-    
     <h4> Delete a Word </h4>
     <form method="post" action="/delete_word">
       <div class ="form-group">
@@ -73,7 +71,7 @@
       </div>
     </form>
   </div>
-  
+</div>
   <div id="category-admin">
     <h3>Category Admin</h3>
     <h4>Add a Category</h4>
@@ -99,13 +97,14 @@
         <div class ="form-element"><input type="submit" value ="Delete Category"></div>
       </div>
     </form>
+  
+    <div id="dictionary-refer">
+      <h4>Go to the dictionary</h4>
+      <p>Go to the dictionary page to test out your changes!</p>
+      <form action="/dictionary/1" id="dictionary-refer-button">
+        <input type="submit" value="Go To Menu"></input>
+      </form>
+    </div>
   </div>
 
-  <div id="dictionary-refer">
-    <h4>Go to the dictionary</h4>
-    <p>Go to the dictionary page to test out your changes!</p>
-    <form action="/dictionary/1" id="dictionary-refer-button">
-      <input type="submit" value="Go To Menu"></input>
-    </form>
-</div>
 {% endblock %}

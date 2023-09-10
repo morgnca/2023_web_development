@@ -7,7 +7,7 @@
   <div id="dictionary-admin">
     <h3>Dictionary Admin</h3>
     <h4>Add a New Word</h4>
-    <form method="post" action="/add_word">
+    <form id="add-word-form" method="post" action="/add_word">
       <div class="form-group">
         <div class="form-label"><label for="name">Maori Word:</label></div>
         <div class="form-element"><input type="text" name="name" id="name" required>   </div>
@@ -55,7 +55,7 @@
       </div>
     </form>
     <h4> Delete a Word </h4>
-    <form method="post" action="/delete_word">
+    <form id="delete-word-form" method="post" action="/delete_word">
       <div class ="form-group">
         <div class ="form-label"><label for="word_id">Word Name:</label></div>
         <div class ="form-element">
@@ -76,7 +76,7 @@
   <div id="category-admin">
     <h3>Category Admin</h3>
     <h4>Add a Category</h4>
-    <form method = "post" action = "/add_category">
+    <form id="add-category-form" method = "post" action = "/add_category">
       <div class="form-group">
         <div class="form_label"><label for="name">Category Name</label></div>
         <div class="form-element"><input type="text" name="name"  id="name" required></div>
@@ -85,7 +85,7 @@
     </form>
     
     <h4> Delete a category </h4>
-    <form method="post" action="/delete_category">
+    <form id="delete-category-form" method="post" action="/delete_category">
       <div class ="form-group">
         <div class ="form-label"><label for="name">Category Name:</label></div>
         <div class ="form-element">

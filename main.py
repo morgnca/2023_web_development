@@ -246,7 +246,7 @@ def render_word_info(word_id):
 @app.route('/add_category', methods=['POST'])
 def add_category():
   """Add a new category to the database"""
-  if not is_logged_in():
+  if not is_logged_in() or not check_admin():
     return redirect('/?error=Need+to+be+logged+in.')
   if request.method == "POST":
     print(request.form)
@@ -263,7 +263,7 @@ def add_category():
 @app.route('/delete_category', methods=['POST'])
 def render_delete_category():
   """Remove a category to the database"""
-  if not is_logged_in():
+  if not is_logged_in() or not check_admin():
     return redirect('/?message=Need+to+be+logged+in.')
   if request.method == "POST":
     category = request.form.get('cat_id')
@@ -285,7 +285,7 @@ def render_delete_category():
 @app.route('/delete_category_confirm/<int:cat_id>')
 def delete_category_confirm(cat_id):
   """Confirm the deletion of a category from the database"""
-  if not is_logged_in():
+  if not is_logged_in() or not check_admin():
     return redirect('/?message=Need+to+be+logged+in.')
   con = create_connection(DATABASE)
   query = "DELETE FROM categories WHERE category_id = ?"
@@ -298,7 +298,7 @@ def delete_category_confirm(cat_id):
 @app.route('/add_word', methods=['POST'])
 def add_word():
   """Add a word to the dictionary"""
-  if not is_logged_in():
+  if not is_logged_in() or not check_admin():
     return redirect('/?message=Need+to+be+logged+in.')
   if request.method == "POST":
     print(request.form)
@@ -332,7 +332,7 @@ def add_word():
 @app.route('/delete_word', methods=['POST'])
 def delete_word():
   """Delete a word from the dictionary"""
-  if not is_logged_in():
+  if not is_logged_in() or not check_admin():
     return redirect('/?message=Need+to+be+logged+in.')
   if request.method == "POST":
     items = request.form.get('word_id')
@@ -354,7 +354,7 @@ def delete_word():
 
 @app.route('/delete_word_confirm/<int:word_id>')
 def delete_item_confirm(word_id):
-  if not is_logged_in():
+  if not is_logged_in() or not check_admin():
     return redirect('/?message=Need+to+be+logged+in.')
   con = create_connection(DATABASE)
   query = "DELETE FROM words WHERE word_id = ?"
@@ -368,7 +368,7 @@ def delete_item_confirm(word_id):
 @app.route('/edit/<int:word_id>/<type>', methods=['POST'])
 def edit_word(word_id, type):
   """Edit a value of a word from the dictionary"""
-  if not is_logged_in():
+  if not is_logged_in() or not check_admin():
     return redirect('/?message=Need+to+be+logged+in.')
 
   # Retrieve the new value

@@ -5,13 +5,22 @@
 {% block main %}
 <div class="word-info">
   <div class="left-info">
-    <h2>{{ word[1].title() }}</h2>
+    <div class="dictionary-refer">
+      <form action="/dictionary/1" id="dictionary-refer-button">
+        <input type="submit" value="Go Back"></input>
+      </form>
+    </div>
+    <br>
+    
+    <h3>{{ word[1].title() }}</h3>
     {% if teacher %}
     <form class="word-info-form" method="post" action="/edit/{{ word[0] }}/word_name">
       <input type="text" name="value" id="word_name">
       <input type="submit" value="Change Word's Name">
     </form>
     {% endif %}
+
+    <br>
 
     <p>Category: {{ word[7].title() }}</p>
     {% if teacher %}
@@ -68,14 +77,14 @@
     </form>
     {% endif %}
     </div>
-    <div class="left-info-words">
-      <p>Created by {{ word[8] }}</p>
+    <div class="right-info-words">
+      <p><i>Created by {{ word[8] }}</i></p>
       {% if not word[6] == None %}
-      <p>{{ word[6] }}</p>
+      <p><i>{{ word[6] }}</i></p>
       {% else %}
-      <p>(Time created not recorded)</p>
+      <p><i>(Time created not recorded)</i></p>
       {% endif %}
     </div>
   </div>
-<div class="word-info">
+</div>
 {% endblock %}

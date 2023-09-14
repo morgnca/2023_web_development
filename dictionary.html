@@ -4,21 +4,41 @@
 
 {% block main %}
 <div id="description-box">
-  <p>Welcome to the Te-Reo Maori to English dictionary! Use the drop-down menu to select a category.</p>
+  <p>Welcome to the Te-Reo Maori to English dictionary!</p>
+  <p>Use the drop-down menus to filter the results by category or level, or use the search bar top look for a particular Te Reo word.</p>
 </div>
 
-<div id="category-dropdown">
-  <button id="category-button">{{ current_page.title() }}</button>
-  <div id="dropdown-contents">
-    {% for category in categories %}
-    <li><a href = "/dictionary/{{ category [0] }}">{{ category[1].title() }}</a></li>
-    {% endfor %}
+<div id="sort-menu">
+
+  <div id="category-dropdown">
+    <button id="category-button">{{ current_page[0].title() }}</button>
+    <div id="dropdown-contents">
+      {% for category in categories %}
+      <li><a href = "/dictionary/category/{{ category [0] }}">{{ category[1].title() }}</a></li>
+      {% endfor %}
+    </div>
   </div>
+  
+  <div id="level-dropdown">
+    <button id="category-button">{{ current_page[1] }}</button>
+    <div id="dropdown-contents">
+      {% for i in range(1, 11) %}
+      <li><a href = "/dictionary/level/{{ i }}">Level {{ i }}</a></li>
+      {% endfor %}
+    </div>
+  </div>
+
+  <form id="search-form" action="/dictionary/search" method="post">
+    <div class="form-element"><input type="text" name="search" id="search" required></div>
+    <div class="form-element"><input type="submit" value="Search Dictionary"></div>
+  </form>
+  
 </div>
 
 <div class="word-grid">
   {% for word in words %}
     <div class="word-box">
+      <h3>{{ word[1].title() }}</h3>
       <div class="word-box-image">
         {% if word[4] == None %}
         <img src="/static/images/noimage.png">
@@ -27,9 +47,12 @@
         {% endif %}
       </div>
       <div class="word-box-info">
-        <h3>{{ word[1].title() }}</h3>
-        <p>{{ word[2].title() }}</p>
+        <p>English: {{ word[2].title() }}</p>
+        <p>Level: {{ word[5] }}</p>
       </div>
+      <form class="word-info-button" action="/word_info/{{ word[0] }}">
+        <input type=submit value="Learn More">
+      </form>
     </div>
   {% endfor %}
 </div>

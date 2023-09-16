@@ -13,6 +13,7 @@ app.secret_key = "c2VuZGhlbHA"
 DATABASE = "dictionary.db"
 STUDENT_EMAIL = "student"
 
+
 def create_connection(db_file):
   """Create connection to database"""
   try:
@@ -21,6 +22,7 @@ def create_connection(db_file):
   except Error as e:
     print(e)
   return None
+
 
 # Functions to edit/retrieve data from to the database
 def get_list(query, parameters):
@@ -35,6 +37,7 @@ def get_list(query, parameters):
   con.close()
   return query_list
 
+
 def put_data(query, parameters):
   """Update the database with data and parameters"""
   con = create_connection(DATABASE)
@@ -43,16 +46,31 @@ def put_data(query, parameters):
   con.commit()
   con.close()
 
+
 def get_categories():
   """Retrieve all category ids, names"""
   cat_list = get_list("""SELECT * FROM categories 
-  ORDER BY category_name""","")
+  ORDER BY category_name""", "")
   return cat_list
+
 
 def get_word_list():
   """Retrieve info of all words"""
-  word_list = get_list("SELECT * FROM words ORDER BY word_name","")
+  word_list = get_list("SELECT * FROM words ORDER BY word_name", "")
   return word_list
+
+def append_alttext(words):
+  """Create suitable alt texts for database images"""
+  for i in words:
+    word = list(i)
+    if word[4]:
+      image_name = word[4].split(".")
+      alt_text = "A picture of " + image_name[0]
+    else:
+      alt_text = "No image displayed"
+
+    word.append(alt_text)
+  return(words)
 
 # Login checking functions
 def is_logged_in():
@@ -63,7 +81,8 @@ def is_logged_in():
     return False
   else:
     print("Logged in")
-    return True 
+    return True
+
 
 def check_admin():
   """Check to see if the user is a teacher or student user"""
@@ -75,6 +94,7 @@ def check_admin():
       print("Student user")
       return False
 
+
 # Webpage shortcuts
 @app.route('/')
 def render_homepage():
@@ -84,28 +104,11 @@ def render_homepage():
   #pw = bcrypt.generate_password_hash('decayisanextantformoflife')
   #print(pw)
   #put_data("UPDATE users SET password=?", [pw])
-  return render_template('index.html',logged_in=is_logged_in(),
-                         teacher=check_admin(), message=message)
+  return render_template('index.html',
+                         logged_in=is_logged_in(),
+                         teacher=check_admin(),
+                         message=message)
 
-@app.route('/dictionary/<cat_id>')
-def render_dict_page(cat_id):
-  current_category = get_list("""SELECT category_name 
-  FROM categories 
-  WHERE category_id = ?""", [cat_id])
-  current_page = str(current_category[0][0]).title()
-  words = get_list("""SELECT * FROM words WHERE category_id = ?
-  ORDER BY word_name""",
-                   [cat_id])
-
-  message = request.args.get('message')
-  print(message)
-  if message is None:
-    message = ""
-  
-  return render_template('dictionary.html', 
-                         categories = get_categories(), words=words,
-                        logged_in=is_logged_in(), teacher=check_admin(),
-                        current_page=current_page, message=message)
 
 @app.route('/admin')
 def render_admin():
@@ -113,15 +116,18 @@ def render_admin():
   print(message)
   if message is None:
     message = ""
-  return render_template('admin.html', words = get_word_list(), 
-                         categories =get_categories(),
+  return render_template('admin.html',
+                         words=get_word_list(),
+                         categories=get_categories(),
                          logged_in=is_logged_in(),
-                         teacher=check_admin(), message=message)
-  
+                         teacher=check_admin(),
+                         message=message)
+
+
 @app.route('/login', methods=['POST', 'GET'])
 def render_login():
   if is_logged_in():
-    return redirect('/dictionary/1')
+    return redirect('/dictionary/category/1')
   print("Logging in")
   if request.method == 'POST':
     email = request.form['email'].strip().lower()
@@ -136,13 +142,14 @@ def render_login():
       teacher = user_data[0][2]
       db_password = user_data[0][3]
       print(user_id, first_name, teacher, db_password)
-      
+
     except IndexError:
       return redirect("/login?message=Email+invalid+or+password+incorrect")
 
     # Validation for the password being correct
     if not bcrypt.check_password_hash(db_password, password):
-      return redirect(request.referrer + "?message=Email+invalid+or+password+incorrect")
+      return redirect(request.referrer +
+                      "?message=Email+invalid+or+password+incorrect")
 
     # Setting the session data
     session['email'] = email
@@ -151,14 +158,16 @@ def render_login():
     session['teacher'] = teacher
     print(session)
     return redirect('/')
-    
-  
+
   message = request.args.get('message')
   print(message)
   if message is None:
     message = ""
-  return render_template('login.html', logged_in=is_logged_in(),
-                         teacher=check_admin(), message=message)
+  return render_template('login.html',
+                         logged_in=is_logged_in(),
+                         teacher=check_admin(),
+                         message=message)
+
 
 @app.route('/logout')
 def logout():
@@ -168,10 +177,13 @@ def logout():
   print(list(session.keys()))
   return redirect('/?message=See+you+next+time!')
 
+
 @app.route('/signup', methods=['POST', 'GET'])
 def render_signup():
   if is_logged_in():
-      return redirect('/dictionary/1')
+    return redirect('/dictionary/category/1')
+
+  # Retrieving data from form
   if request.method == 'POST':
     print(request.form)
     fname = request.form.get('fname').title().strip()
@@ -192,7 +204,6 @@ def render_signup():
     # Assign the user a student or teacher account
     if not request.form.get('teacher') or STUDENT_EMAIL in email:
       teacher = 0
-      
 
     con = create_connection(DATABASE)
     query = """INSERT INTO users 
@@ -214,33 +225,130 @@ def render_signup():
   print(message)
   if message is None:
     message = ""
-  return render_template('signup.html',logged_in=is_logged_in(),
-                         teacher=check_admin(), message=message)
+  return render_template('signup.html',
+                         logged_in=is_logged_in(),
+                         teacher=check_admin(),
+                         message=message)
+
 
 @app.route('/word_info/<int:word_id>', methods=['GET', 'POST'])
 def render_word_info(word_id):
-  words = get_list("SELECT * FROM words WHERE word_id = ?",[word_id])
+  words = get_list("SELECT * FROM words WHERE word_id = ?", [word_id])
   word_info = list(words[0])
 
   # Rtrieving the category and user who created the word from ids
   if not word_info[8]:
     word_info[8] = "1"
-  users = get_list("SELECT first_name, last_name FROM users WHERE user_id = ?", [word_info[8]])
+  users = get_list("SELECT first_name, last_name FROM users WHERE user_id = ?",
+                   [word_info[8]])
   user = str(" ".join(users[0]).title())
   word_info[8] = user
-  category = get_list("SELECT category_name FROM categories WHERE category_id = ?", [word_info[7]])
+  category = get_list(
+    "SELECT category_name FROM categories WHERE category_id = ?",
+    [word_info[7]])
   word_info[7] = " ".join(category[0]).title()
-  print(word_info)
+
+  # Setting alt-text
+  if word_info[4]:
+    image_name = word_info[4].split(".")
+    alt_text = "A picture of " + image_name[0]
+  else:
+    alt_text = "No image displayed"
+  word_info.append(alt_text)
 
   message = request.args.get('error')
   print(message)
   if message is None:
     message = ""
-  
-  return render_template('word_info.html', word=word_info,
+
+  return render_template('word_info.html',
+                         word=word_info,
                          logged_in=is_logged_in(),
-                         teacher=check_admin(), message=message,
+                         teacher=check_admin(),
+                         message=message,
                          categories=get_categories())
+
+
+# Menu Page Functions
+@app.route('/dictionary/category/<cat_id>')
+def render_dict_cat(cat_id):
+  """Sorts the menu based on a given category"""
+  current_category = get_list(
+    """SELECT category_name 
+  FROM categories 
+  WHERE category_id = ?""", [cat_id])
+  current_page = [str(current_category[0][0]).title(), "Levels"]
+  words = get_list(
+    """SELECT * FROM words WHERE category_id = ?
+  ORDER BY word_name""", [cat_id])
+
+  all_words = append_alttext(words)
+
+  message = request.args.get('message')
+  print(message)
+  if message is None:
+    message = ""
+
+  return render_template('dictionary.html',
+                         categories=get_categories(),
+                         words=all_words,
+                         logged_in=is_logged_in(),
+                         teacher=check_admin(),
+                         current_page=current_page,
+                         message=message)
+
+
+@app.route('/dictionary/level/<level>')
+def render_dict_lev(level):
+  """Sorts the menu based on a given level"""
+  words = get_list(
+    """SELECT * FROM words WHERE level = ?
+  ORDER BY word_name""", [level])
+  level_name = "Level " + level
+  current_page = ["Categories", level_name]
+
+  all_words = append_alttext(words)
+
+  message = request.args.get('message')
+  print(message)
+  if message is None:
+    message = ""
+
+  return render_template('dictionary.html',
+                         categories=get_categories(),
+                         words=all_words,
+                         logged_in=is_logged_in(),
+                         teacher=check_admin(),
+                         current_page=current_page,
+                         message=message)
+
+
+@app.route('/dictionary/search', methods=['GET', 'POST'])
+def render_dict_search():
+  """Sorts the menu based on a given string"""
+  if request.method == 'POST':
+    search_term = request.form['search'].strip().lower()
+    words = get_list(
+      """SELECT * FROM words
+    WHERE word_name LIKE ? ORDER BY word_name""", ['%' + search_term + '%'])
+    current_page = ["Categories", "Levels"]
+    print(words)
+
+    all_words = append_alttext(words)
+
+  message = request.args.get('message')
+  print(message)
+  if message is None:
+    message = ""
+
+  return render_template('dictionary.html',
+                         categories=get_categories(),
+                         words=all_words,
+                         logged_in=is_logged_in(),
+                         teacher=check_admin(),
+                         current_page=current_page,
+                         message=message)
+
 
 # Admin Functions
 @app.route('/add_category', methods=['POST'])
@@ -250,7 +358,7 @@ def add_category():
     return redirect('/?error=Need+to+be+logged+in.')
   if request.method == "POST":
     print(request.form)
-    cat_name = request.form.get('name').lower().strip()
+    cat_name = request.form.get('cat_name').lower().strip()
     print(cat_name)
     con = create_connection(DATABASE)
     query = "INSERT INTO categories ('category_name') VALUES (?)"
@@ -259,6 +367,7 @@ def add_category():
     con.commit()
     con.close()
     return redirect('/admin')
+
 
 @app.route('/delete_category', methods=['POST'])
 def render_delete_category():
@@ -276,11 +385,14 @@ def render_delete_category():
     print(message)
     if message is None:
       message = ""
-      
-    return render_template('confirm_delete.html', id=cat_id,
-                           name=cat_name, type="category",
+
+    return render_template('confirm_delete.html',
+                           id=cat_id,
+                           name=cat_name,
+                           type="category",
                            message=message)
     return redirect("/admin")
+
 
 @app.route('/delete_category_confirm/<int:cat_id>')
 def delete_category_confirm(cat_id):
@@ -294,6 +406,7 @@ def delete_category_confirm(cat_id):
   con.commit()
   con.close()
   return redirect("/admin")
+
 
 @app.route('/add_word', methods=['POST'])
 def add_word():
@@ -324,10 +437,12 @@ def add_word():
     query = """INSERT INTO words ('word_name', 'english','description', 'image', 'level', 'category_id', 'user_id', 'entry_date') 
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)"""
     cur = con.cursor()
-    cur.execute(query, (name, english, description, image, level, category, user, time))
+    cur.execute(
+      query, (name, english, description, image, level, category, user, time))
     con.commit()
     con.close()
     return redirect("/admin")
+
 
 @app.route('/delete_word', methods=['POST'])
 def delete_word():
@@ -348,9 +463,14 @@ def delete_word():
     print(message)
     if message is None:
       message = ""
-    
-    return render_template('confirm_delete.html', id=word_id, name=word_name, type="word", message=message)
+
+    return render_template('confirm_delete.html',
+                           id=word_id,
+                           name=word_name,
+                           type="word",
+                           message=message)
     return redirect("/admin")
+
 
 @app.route('/delete_word_confirm/<int:word_id>')
 def delete_item_confirm(word_id):
@@ -362,8 +482,9 @@ def delete_item_confirm(word_id):
   cur.execute(query, (word_id, ))
   con.commit()
   con.close()
-  
+
   return redirect("/admin")
+
 
 @app.route('/edit/<int:word_id>/<type>', methods=['POST'])
 def edit_word(word_id, type):
@@ -379,13 +500,9 @@ def edit_word(word_id, type):
     print(value)
 
     # Updating the database
-    #if type == "word_name":
-      #put_data("""UPDATE words SET word_name = ? 
-      #WHERE word_id = ?""", (value, word_id))
-    #elif type == "english":
-    query = str("UPDATE words SET "+type+" = ? WHERE word_id = ?")
-    put_data(query, (value, word_id)) 
-      
+    query = str("UPDATE words SET " + type + " = ? WHERE word_id = ?")
+    put_data(query, (value, word_id))
+
     return redirect("/?message=Updated+information")
 
 

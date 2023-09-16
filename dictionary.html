@@ -21,7 +21,7 @@
   </div>
   
   <div id="level-dropdown">
-    <button id="category-button">{{ current_page[1] }}</button>
+    <button id="level-button">{{ current_page[1] }}</button>
     <div id="dropdown-contents">
       {% for i in range(1, 11) %}
       <li><a href = "/dictionary/level/{{ i }}">Level {{ i }}</a></li>
@@ -42,9 +42,9 @@
       <h3>{{ word[1].title() }}</h3>
       <div class="word-box-image">
         {% if word[4] == None %}
-        <img src="/static/images/noimage.png">
+        <img src="/static/images/noimage.png" alt="{{ word[-1] }}">
         {% else %}
-        <img src="/static/images/{{ word[4] }}">
+        <img src="/static/images/{{ word[4] }}" alt="{{ word[-1] }}">
         {% endif %}
       </div>
       <div class="word-box-info">

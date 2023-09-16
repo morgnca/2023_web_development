@@ -12,7 +12,7 @@
     </div>
     <br>
     
-    <h3>{{ word[1].title() }}</h3>
+    <label for="word_name"><h3>{{ word[1].title() }}</h3></label>
     {% if teacher %}
     <form class="word-info-form" method="post" action="/edit/{{ word[0] }}/word_name">
       <input type="text" name="value" id="word_name">
@@ -22,7 +22,7 @@
 
     <br>
 
-    <p>Category: {{ word[7].title() }}</p>
+    <label for="category"><p>Category: {{ word[7].title() }}</p></label>
     {% if teacher %}
     <form class="word-info-form" method="post" action="/edit/{{ word[0] }}/category_id">
       <select id="category" name="value">
@@ -34,7 +34,7 @@
     </form>
     {% endif %}
       
-    <p>English: {{ word[2].title() }}</p>
+    <label for="english"><p>English: {{ word[2].title() }}</p></label>
     {% if teacher %}
     <form class="word-info-form" method="post" action="/edit/{{ word[0] }}/english">
       <input type="text" name="value" id="english">
@@ -42,7 +42,7 @@
     </form>
     {% endif %}
     
-    <p>Level: {{ word[5] }}</p>
+    <label for="level-select"><p>Level: {{ word[5] }}</p></label>
     {% if teacher %}
     <form class="word-info-form" method="post" action="/edit/{{ word[0] }}/level">
       <select id="level-select" name="value" required> 
@@ -54,7 +54,7 @@
     </form>
     {% endif %}
     
-    <p>Description: {{ word[3] }}</p>
+    <label for="description"><p>Description: {{ word[3] }}</p></label>
     {% if teacher %}
     <form class="word-info-form" method="post" action="/edit/{{ word[0] }}/description">
       <input type="text" name="value" id="description">
@@ -66,9 +66,9 @@
   <div class="right-info">
     <div class="info-image">
       {% if word[4] == None %}
-      <img src="/static/images/noimage.png">
+      <img src="/static/images/noimage.png" alt="{{ word[9] }}">
       {% else %}
-      <img src="/static/images/{{ word[4] }}">
+      <img src="/static/images/{{ word[4] }}" alt="{{ word[9] }}">
       {% endif %}
       {% if teacher %}
     <form class="word-info-form" method="post" action="/edit/{{ word[0] }}/image">

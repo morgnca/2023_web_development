@@ -1,6 +1,25 @@
 {% extends "base.html" %}
 
-{% block pageheading %}welcome{% endblock %}
+{% block pageheading %}Welcome to the Dictionary{% endblock %}
 
 {% block main %}
+<div class="index-box">
+  <h3>Te Reo Maori to English Dictionary</h3>
+  <p>Te Reo Maori is one of New Zealands three official languages. It is used in place names, the news, and various cultural items found all over New Zealand! As Te Reo Maori is compulsory to learn in schools, this dictionary was made to help students and teachers alike on the journey to raise awareness for this wonderful language.</p>
+  <p>Learn new Te Reo Maori words on our illustrated Te Reo Maori to English dictionary. Discover new pieces of traditional Maori culture and relate them back to concepts in English. Sort the dictionary in various way to find the specific words you need.</p>
+  <form action="/dictionary/category/1" id="refer-button">
+    <input type="submit" value="Go to Dictionary"></input>
+  </form>
+</div>
+
+<div class="index-box">
+  <h3>Create Your Account</h3>
+  <h4>Sign up as a student today!</h4>
+  <p>Improve your learning by comparing unfamilliar Maori words to pictures, and gain confidence by looking up words you don't know.</p>
+  <h4>Sign up as a teacher today!</h4>
+  <p>Create and edit words and item categories for the website. Grow the dictionary and enhance the learning ability of your students.</p>
+  <form action="/signup" id="refer-button">
+    <input type="submit" value="Go to Signup"></input>
+  </form>
+</div>
 {% endblock %}

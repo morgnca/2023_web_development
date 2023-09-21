@@ -3,6 +3,11 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    word-wrap: break-word;
+}
+
+html {
+  height: 100%
 }
 
 #container {
@@ -14,7 +19,16 @@
 header {
     grid-area: header;
     background-color: #6E2D27;
-    padding: 1rem;
+    padding: 0.5rem;
+}
+
+header h1 {
+  font-size: 3em;
+}
+
+header h2 {
+  font-size: 2em;
+  padding-bottom: 1%;
 }
 
 html {
@@ -22,7 +36,12 @@ html {
 }
 
 nav {
-    grid-area: nav;
+  grid-area: nav;
+}
+
+nav a {
+  font-size: 1.05em;
+  padding-right: 3%;
 }
 
 main {
@@ -33,15 +52,21 @@ main {
 
 body {
   margin: 0;
-  padding-right: 10%;
-  padding-left: 10%;
+  padding-right: 11%;
+  padding-left: 11%;
 }
 
 h1, h2 {
   color: white;
 }
 
-h3, h4 {
+h3 {
+  color: #6E2D27;
+  font-size: 2em;
+}
+
+
+h4 {
     padding: 1rem 0;
     font-family: 'Suez One', serif;
     color: #000;
@@ -77,6 +102,17 @@ img {
     display: inline;
     width: 1rem;
     margin-left: 0.5rem;
+}
+
+input[type=submit], button {
+  background-color: #886159;
+  color: white;
+  border-style: solid;
+  padding: 5px;
+}
+
+input[type=submit]:hover, button:hover {
+  background-color: #c49287;
 }
 
 .error {
@@ -115,21 +151,82 @@ footer {
 }
 
 footer p {
-    color: #000;
-    text-shadow: 2px 2px 4px #fff;
-    font-size: 1.5rem;
+    color: #fff;
 }
 
 footer img {
     float: right;
 }
 
-/* Dictionary Page Classes/ids */
-#description-box {
-  background-color: #886159;
+#error-message {
+  background-color: red;
+  height: 10%;
 }
 
-#category-dropdown {
+#error-message h4 {
+  color: white;
+  size: 2em;
+}
+
+.index-box {
+  padding: 2%;
+  margin-bottom: 10px;
+  background-color: #dbc0b2;
+  border-style: dashed;
+  border-color: #886159;
+}
+
+.index-box h3 {
+  font-size: 1.5em;
+}
+
+.index-box h4 {
+  font-size: 1.25em;
+}
+
+/* Form styling */
+#signup-form {
+  width: 40%;
+  margin: auto;
+  background-color: #dbc0b2;
+  border-style: dashed;
+  border-color: #886159;
+}
+
+.login-form {
+  width: 40%;
+  margin: auto;
+  background-color: #dbc0b2;
+  border-style: dashed;
+  border-color: #886159;
+}
+
+#admin-grid form {
+  width: 90%;
+}
+
+.form-group {
+  margin-top: 2%;
+  padding: 2%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+/* Dictionary page classes/ids */
+#description-box {
+  background-color: #c49287;
+}
+
+#sort-menu {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  width: 60%;
+  padding: 2%
+}
+
+#category-dropdown, #level-dropdown {
   position: relative;
 }
 
@@ -154,20 +251,8 @@ footer img {
   text-decoration: underline;
 }
 
-#category-dropdown:hover #dropdown-contents {
+#category-dropdown:hover #dropdown-contents, #level-dropdown:hover #dropdown-contents {
   display: block;
-}
-
-#category-nav ul {
-  overflow: hidden;
-  list-style-type: none;
-  margin: 0;
-}
-
-#category-nav li {
-  float: left;
-  padding-left: 2%;
-  padding-right: 2%;
 }
 
 .word-grid {
@@ -179,18 +264,157 @@ footer img {
 .word-box {
   width: 31%;
   margin-bottom: 1rem;
+  background-color: white;
+  padding: 3%;
 }
 .word-box-image {
-  height: 150px;
+  height: 45%;
   overflow: hidden;
+  background-image: url('images/noimage.png');
+  background-size: 100%;
+  background-repeat: no-repeat;
 }
 
 .word-box-info {
   padding: 0.5rem;
+  white-space: nowrap;
+  text-overflow: ellipses;
+  overflow: hidden;
 }
 
-/* Media */
+.word-box-title {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.word-box-title h3 {
+  color: black;
+  font-size: 1.25em;
+  text-decoration: none;
+}
+
+/* Word_info page ids */
+.word-info {
+  background-color: #dbc0b2;
+  border-style: dashed;
+  border-color: #886159;
+  display: flex;
+  flex-wrap: nowrap;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+}
+
+.right-info-words p {
+  font-size: 1em;
+}
+
+.word-info p {
+  font-size: 1.25em;
+  margin-top: 1.5%;
+}
+
+.left-info, .right-info {
+  width: 45%;
+  height: 100%;
+  margin: 4%;
+}
+
+.word-info .dictionary-refer {
+  padding: 2%;
+  margin: 0;
+  margin-top: -1%;
+}
+
+.info-image {
+  height: calc(70vh - 100px);
+  width: 100%;
+  overflow: hidden;
+  background-image: url('images/noimage.png');
+  background-size: 100%;
+  background-repeat: no-repeat;
+}
+
+/* Admin page ids */
+#admin-grid {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  flex-direction: row;
+  margin: auto;
+  padding-top: 3%;
+}
+
+#admin-grid #category-admin {
+  width: 48%;
+  background-color: #dbc0b2;
+  border-style: dashed;
+  border-color: #886159;
+}
+
+#admin-grid #dictionary-admin {
+  width: 48%;
+  background-color: #dbc0b2;
+  border-style: dashed;
+  border-color: #886159;
+}
+
+#admin-grid h4 {
+  font-size: 1.2em;
+}
+
+#admin-grid h3 {
+  font-size: 1.5em;
+}
+
+.dictionary-refer {
+  background-color: #886159;
+  width: 50%;
+  margin-top: 20%;
+  color: white;
+}
+
+#admin-grid .dictionary-refer {
+  padding: 2%;
+  margin-left: 2%;
+}
+
+.dictionary-refer input[type=submit] {
+  border-style: solid;
+  border-color: white;
+}
+
+.dictionary-refer h4 {
+  color: white;
+}
+
+/* For smaller screens */
 @media only screen and (max-width: 768px) {
+    #sort-menu {
+      width: 100%;
+    }
+  
+    .word-info {
+      flex-wrap: wrap;
+    }
+
+    .left-info, .right-info {
+      width: 100%;
+    }
+  
+    #admin-grid #category-admin {
+      width: 100%;
+    }
+    
+    #admin-grid #dictionary-admin {
+      width: 100%;
+    }
+
+    .word-box-image {
+      height: 150px;
+    }
+  
     nav
     {
       display: block;

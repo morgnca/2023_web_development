@@ -70,14 +70,14 @@
       {% else %}
       <img src="/static/images/{{ word[4] }}" alt="{{ word[9] }}">
       {% endif %}
-      {% if teacher %}
-    <form class="word-info-form" method="post" action="/edit/{{ word[0] }}/image">
-      <input type="text" name="value" id="image">
-      <input type="submit" value="Change Image Path">
-    </form>
-    {% endif %}
     </div>
     <div class="right-info-words">
+      {% if teacher %}
+      <form class="word-info-form" method="post" action="/edit/{{ word[0] }}/image">
+        <input type="text" name="value" id="image">
+        <input type="submit" value="Change Image Path">
+      </form>
+      {% endif %}
       <p><i>Created by {{ word[8] }}</i></p>
       {% if not word[6] == None %}
       <p><i>{{ word[6] }}</i></p>

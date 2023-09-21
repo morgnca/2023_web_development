@@ -15,7 +15,7 @@ STUDENT_EMAIL = "student"
 
 
 def create_connection(db_file):
-  """Create connection to database"""
+  """Create connection to database."""
   try:
     connection = sqlite3.connect(db_file)
     return connection
@@ -26,7 +26,7 @@ def create_connection(db_file):
 
 # Functions to edit/retrieve data from to the database
 def get_list(query, parameters):
-  """Retrieve a list of data from the database w/wout parameters"""
+  """Retrieve a list of data from the database w/wout parameters."""
   con = create_connection(DATABASE)
   cur = con.cursor()
   if parameters == "":
@@ -39,7 +39,7 @@ def get_list(query, parameters):
 
 
 def put_data(query, parameters):
-  """Update the database with data and parameters"""
+  """Update the database with data and parameters."""
   con = create_connection(DATABASE)
   cur = con.cursor()
   cur.execute(query, parameters)
@@ -48,19 +48,19 @@ def put_data(query, parameters):
 
 
 def get_categories():
-  """Retrieve all category ids, names"""
+  """Retrieve all category ids, names."""
   cat_list = get_list("""SELECT * FROM categories 
   ORDER BY category_name""", "")
   return cat_list
 
 
 def get_word_list():
-  """Retrieve info of all words"""
+  """Retrieve info of all words."""
   word_list = get_list("SELECT * FROM words ORDER BY word_name", "")
   return word_list
 
 def append_alttext(words):
-  """Create suitable alt texts for database images"""
+  """Create suitable alt texts for database images."""
   for i in words:
     word = list(i)
     if word[4]:
@@ -74,7 +74,7 @@ def append_alttext(words):
 
 # Login checking functions
 def is_logged_in():
-  """Check to see if the user is logged in or not"""
+  """Check to see if the user is logged in or not."""
   print(session)
   if session.get("email") is None:
     print("Not logged in")
@@ -85,7 +85,7 @@ def is_logged_in():
 
 
 def check_admin():
-  """Check to see if the user is a teacher or student user"""
+  """Check to see if the user is a teacher or student user."""
   if is_logged_in():
     if session.get("teacher") == 1:
       print("Teacher user")
@@ -101,9 +101,6 @@ def render_homepage():
   message = request.args.get('message')
   if message is None:
     message = ""
-  #pw = bcrypt.generate_password_hash('decayisanextantformoflife')
-  #print(pw)
-  #put_data("UPDATE users SET password=?", [pw])
   return render_template('index.html',
                          logged_in=is_logged_in(),
                          teacher=check_admin(),
@@ -113,7 +110,6 @@ def render_homepage():
 @app.route('/admin')
 def render_admin():
   message = request.args.get('message')
-  print(message)
   if message is None:
     message = ""
   return render_template('admin.html',
@@ -141,7 +137,6 @@ def render_login():
       first_name = user_data[0][1]
       teacher = user_data[0][2]
       db_password = user_data[0][3]
-      print(user_id, first_name, teacher, db_password)
 
     except IndexError:
       return redirect("/login?message=Email+invalid+or+password+incorrect")
@@ -156,11 +151,9 @@ def render_login():
     session['firstname'] = first_name
     session['user_id'] = user_id
     session['teacher'] = teacher
-    print(session)
     return redirect('/')
 
   message = request.args.get('message')
-  print(message)
   if message is None:
     message = ""
   return render_template('login.html',
@@ -171,10 +164,8 @@ def render_login():
 
 @app.route('/logout')
 def logout():
-  print(list(session.keys()))
   for key in list(session.keys()):
     session.pop(key)
-  print(list(session.keys()))
   return redirect('/?message=See+you+next+time!')
 
 
@@ -183,12 +174,20 @@ def render_signup():
   if is_logged_in():
     return redirect('/dictionary/category/1')
 
-  # Retrieving data from form
+  # Retrieving data from form and validating
   if request.method == 'POST':
-    print(request.form)
     fname = request.form.get('fname').title().strip()
+    if len(fname) > 35:
+      return redirect("/signup?error=First+name+maximum+length+is+35+characters")
+       
     lname = request.form.get('lname').title().strip()
+    if len(lname) > 35:
+      return redirect("/signup?error=Last+name+maximum+length+is+35+characters")
+      
     email = request.form.get('email').lower().strip()
+    if len(email) > 320:
+      return redirect("/signup?error=Email+maximum+length+is+320+characters")
+      
     password = request.form.get('password')
     password2 = request.form.get('password2')
     teacher = 1
@@ -220,9 +219,8 @@ def render_signup():
     con.commit()
     con.close()
 
-    return redirect("/login")
+    return redirect("/login?message=Signed+up")
   message = request.args.get('error')
-  print(message)
   if message is None:
     message = ""
   return render_template('signup.html',
@@ -257,7 +255,6 @@ def render_word_info(word_id):
   word_info.append(alt_text)
 
   message = request.args.get('error')
-  print(message)
   if message is None:
     message = ""
 
@@ -272,7 +269,7 @@ def render_word_info(word_id):
 # Menu Page Functions
 @app.route('/dictionary/category/<cat_id>')
 def render_dict_cat(cat_id):
-  """Sorts the menu based on a given category"""
+  """Sorts the menu based on a given category."""
   current_category = get_list(
     """SELECT category_name 
   FROM categories 
@@ -285,7 +282,6 @@ def render_dict_cat(cat_id):
   all_words = append_alttext(words)
 
   message = request.args.get('message')
-  print(message)
   if message is None:
     message = ""
 
@@ -300,7 +296,7 @@ def render_dict_cat(cat_id):
 
 @app.route('/dictionary/level/<level>')
 def render_dict_lev(level):
-  """Sorts the menu based on a given level"""
+  """Sorts the menu based on a given level."""
   words = get_list(
     """SELECT * FROM words WHERE level = ?
   ORDER BY word_name""", [level])
@@ -310,7 +306,6 @@ def render_dict_lev(level):
   all_words = append_alttext(words)
 
   message = request.args.get('message')
-  print(message)
   if message is None:
     message = ""
 
@@ -325,19 +320,17 @@ def render_dict_lev(level):
 
 @app.route('/dictionary/search', methods=['GET', 'POST'])
 def render_dict_search():
-  """Sorts the menu based on a given string"""
+  """Sorts the menu based on a given string."""
   if request.method == 'POST':
     search_term = request.form['search'].strip().lower()
     words = get_list(
       """SELECT * FROM words
     WHERE word_name LIKE ? ORDER BY word_name""", ['%' + search_term + '%'])
     current_page = ["Categories", "Levels"]
-    print(words)
 
     all_words = append_alttext(words)
 
   message = request.args.get('message')
-  print(message)
   if message is None:
     message = ""
 
@@ -353,36 +346,37 @@ def render_dict_search():
 # Admin Functions
 @app.route('/add_category', methods=['POST'])
 def add_category():
-  """Add a new category to the database"""
+  """Add a new category to the database."""
   if not is_logged_in() or not check_admin():
-    return redirect('/?error=Need+to+be+logged+in.')
+    return redirect('/?message=Need+to+be+logged+in.')
   if request.method == "POST":
-    print(request.form)
     cat_name = request.form.get('cat_name').lower().strip()
-    print(cat_name)
+
+    # Validate that the category name isn't too long for the database
+    if len(cat_name) > 20:
+      return redirect("/admin?message=Category+name+maximum+length+is+20+characters")
+    
     con = create_connection(DATABASE)
     query = "INSERT INTO categories ('category_name') VALUES (?)"
     cur = con.cursor()
     cur.execute(query, (cat_name, ))
     con.commit()
     con.close()
-    return redirect('/admin')
+    return redirect('/admin?message=Category+added')
 
 
 @app.route('/delete_category', methods=['POST'])
 def render_delete_category():
-  """Remove a category to the database"""
+  """Remove a category to the database."""
   if not is_logged_in() or not check_admin():
     return redirect('/?message=Need+to+be+logged+in.')
   if request.method == "POST":
     category = request.form.get('cat_id')
-    print(category)
     category = category.split(", ")
     cat_id = category[0]
     cat_name = category[1].title()
 
     message = request.args.get('error')
-    print(message)
     if message is None:
       message = ""
 
@@ -396,7 +390,7 @@ def render_delete_category():
 
 @app.route('/delete_category_confirm/<int:cat_id>')
 def delete_category_confirm(cat_id):
-  """Confirm the deletion of a category from the database"""
+  """Confirm the deletion of a category from the database."""
   if not is_logged_in() or not check_admin():
     return redirect('/?message=Need+to+be+logged+in.')
   con = create_connection(DATABASE)
@@ -410,28 +404,40 @@ def delete_category_confirm(cat_id):
 
 @app.route('/add_word', methods=['POST'])
 def add_word():
-  """Add a word to the dictionary"""
+  """Add a word to the dictionary."""
   if not is_logged_in() or not check_admin():
     return redirect('/?message=Need+to+be+logged+in.')
   if request.method == "POST":
-    print(request.form)
+    # Retrieving values and validating
     name = request.form.get("name").lower().strip()
+    if len(name) > 85:
+      return redirect("/admin?message=Word+name+maximum+length+is+85+characters")
+      
     english = request.form.get("english").strip()
+    if len(english) > 85:
+      return redirect("/admin?message=English+maximum+length+is+85+characters")
+      
     description = request.form.get("description")
     if description:
       description.strip()
     else:
       description = "Pending"
+    if len(description) > 300:
+      return redirect("/admin?message=Description+maximum+length+is+300+characters")
+
+    
     level = request.form.get("level").strip()
     image = request.form.get("image")
     if image:
       image.strip()
+      if len(image) > 256:
+        return redirect("/admin?message=Image+maximum+length+is+256+characters")
     else:
       image = None
-    category = request.form.get("cat_id").strip()
+      
+    category = request.form.get("cat_id").strip() 
     user = str(session.get('user_id'))
     time = str(datetime.datetime.now())
-    print(name, english, description, level, image, category, user, time)
 
     con = create_connection(DATABASE)
     query = """INSERT INTO words ('word_name', 'english','description', 'image', 'level', 'category_id', 'user_id', 'entry_date') 
@@ -441,26 +447,24 @@ def add_word():
       query, (name, english, description, image, level, category, user, time))
     con.commit()
     con.close()
-    return redirect("/admin")
+    return redirect("/admin?message=Word+added")
 
 
 @app.route('/delete_word', methods=['POST'])
 def delete_word():
-  """Delete a word from the dictionary"""
+  """Delete a word from the dictionary."""
   if not is_logged_in() or not check_admin():
     return redirect('/?message=Need+to+be+logged+in.')
   if request.method == "POST":
     items = request.form.get('word_id')
     if items is None:
-      return redirect("/admin?error=No+item+selected")
-    print(items)
+      return redirect("/admin?message=No+item+selected")
 
     word = items.split(", ")
     word_id = word[0]
     word_name = word[1].title() if len(word) > 1 else ""
 
-    message = request.args.get('error')
-    print(message)
+    message = request.args.get('message')
     if message is None:
       message = ""
 
@@ -474,6 +478,7 @@ def delete_word():
 
 @app.route('/delete_word_confirm/<int:word_id>')
 def delete_item_confirm(word_id):
+  """Confirm the deletion of a word from the database."""
   if not is_logged_in() or not check_admin():
     return redirect('/?message=Need+to+be+logged+in.')
   con = create_connection(DATABASE)
@@ -488,7 +493,7 @@ def delete_item_confirm(word_id):
 
 @app.route('/edit/<int:word_id>/<type>', methods=['POST'])
 def edit_word(word_id, type):
-  """Edit a value of a word from the dictionary"""
+  """Edit a value of a word from the dictionary."""
   if not is_logged_in() or not check_admin():
     return redirect('/?message=Need+to+be+logged+in.')
 
@@ -496,8 +501,21 @@ def edit_word(word_id, type):
   if request.method == "POST":
     value = request.form.get('value')
     if value is None:
-      return redirect("/admin?error=No+value+selected")
-    print(value)
+      return redirect("/?error=No+value+selected")
+
+    # Validating
+    if type == "word_name":
+      if len(value) > 85:
+        return redirect("/?message=Word+name+maximum+length+is+85+characters")
+    elif type == "english":
+      if len(value) > 85:
+        return redirect("/?message=English+maximum+length+is+85+characters")
+    elif type == "description":
+      if len(value) > 300:
+        return redirect("/?message=Description+maximum+length+is+300+characters")
+    elif type == "image":
+      if len(value) > 256:
+        return redirect("/?message=Image+maximum+length+is+256+characters")
 
     # Updating the database
     query = str("UPDATE words SET " + type + " = ? WHERE word_id = ?")
